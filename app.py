@@ -4,9 +4,10 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import datetime
 import os
+import threading
 
 # Load environment variables (Local)
-load_dotenv()
+load_dotenv(override=True)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'selvi_textiles_secret_key')
@@ -20,6 +21,15 @@ app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = '23it010@psr.edu.in'
 
 mail = Mail(app)
+
+def send_async_email(app, msg):
+    with app.app_context():
+        try:
+            mail.send(msg)
+            print("Email sent successfully!")
+        except Exception as e:
+            print(f"Failed to send email: {e}")
+
 
 # MongoDB Configuration (Local or Cloud)
 MONGO_URI = os.environ.get('MONGO_URI', "mongodb://localhost:27017/")
@@ -128,18 +138,20 @@ def contact():
         try:
             contacts_collection.insert_one(contact_data)
             
-            # Send Email Notification
+            # Send Email Notification Asynchronously
             msg = Message(
                 subject=f"Contact Inquiry: {subject}",
                 recipients=['23it010@psr.edu.in'],
                 body=f"New Contact Form Submission:\n\nName: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
             )
-            mail.send(msg)
+            # Use threading to send email in background
+            threading.Thread(target=send_async_email, args=(app, msg)).start()
             
-            flash(f"Thank you, {name}. Your message has been saved and our team has been notified. We will get back to you soon.", "success")
+            flash(f"Thank you, {name}. Your message has been received! Our team will get back to you soon.", "success")
         except Exception as e:
-            flash("Message saved, but email notification failed. We will contact you soon.", "success")
-            print(f"Error: {e}")
+            flash("Sorry, there was an issue saving your message. Please try again later.", "error")
+            print(f"Database/Email Error: {e}")
+
             
         return redirect(url_for('contact'))
     return render_template('contact.html', title='Contact Us')
@@ -166,18 +178,20 @@ def inquiry():
         try:
             inquiries_collection.insert_one(inquiry_data)
             
-            # Send Email for Quote Request
+            # Send Email for Quote Request Asynchronously
             msg = Message(
                 subject=f"New Quote Request: {product}",
                 recipients=['23it010@psr.edu.in'],
                 body=f"Hello,\n\nYou have a new Quote Request:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
             )
-            mail.send(msg)
+            # Use threading to send email in background
+            threading.Thread(target=send_async_email, args=(app, msg)).start()
             
-            flash(f"Your quote request for {product} has been securely saved and sent! We will contact you soon.", "success")
+            flash(f"Your quote request for {product} has been successfully sent! We will contact you soon.", "success")
         except Exception as e:
-            flash("Your request has been saved. Our team will contact you soon.", "success")
-            print(f"Error: {e}")
+            flash("Your request could not be sent. Please try again.", "error")
+            print(f"Inquiry Error: {e}")
+
             
         return redirect(url_for('products'))
     return render_template('inquiry.html', title='Request Quote', product_name=product_name, products=PRODUCTS)
