@@ -17,10 +17,10 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = '23it010@psr.edu.in'
+app.config['MAIL_USERNAME'] = 'navaneethanv686@gmail.com'
 # Use password from environment variable or hardcoded fallback for immediate functional testing on Vercel
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'yulv ffos ibhb uwbx')
-app.config['MAIL_DEFAULT_SENDER'] = ('Selvi Textiles', '23it010@psr.edu.in')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'rsad myyu sqhs oiww')
+app.config['MAIL_DEFAULT_SENDER'] = ('Selvi Textiles', 'navaneethanv686@gmail.com')
 
 mail = Mail(app)
 
@@ -162,7 +162,7 @@ def contact():
         try:
             msg = Message(
                 subject=f"Contact Inquiry: {subject}",
-                recipients=['23it010@psr.edu.in'],
+                recipients=['navaneethanv686@gmail.com'],
                 body=f"New Contact Form Submission:\n\nName: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
             )
             send_mail(msg)
@@ -212,7 +212,7 @@ def inquiry():
         try:
             msg = Message(
                 subject=f"New Quote Request: {product}",
-                recipients=['23it010@psr.edu.in'],
+                recipients=['navaneethanv686@gmail.com'],
                 body=f"Hello,\n\nYou have a new Quote Request:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
             )
             send_mail(msg)
