@@ -138,7 +138,7 @@ def contact():
         subject = request.form.get('subject')
         message = request.form.get('message')
         
-        # Save to MongoDB
+        # Prepare contact data
         contact_data = {
             "name": name,
             "email": email,
@@ -146,23 +146,33 @@ def contact():
             "message": message,
             "submitted_at": datetime.datetime.now()
         }
-        
+
+        # Try to save to Database
+        db_saved = False
         try:
             contacts_collection.insert_one(contact_data)
-            
-            # Send Email Notification
+            db_saved = True
+        except Exception as e:
+            print(f"Database Save Error: {e}")
+
+        # Try to send Email notification
+        email_sent = False
+        try:
             msg = Message(
                 subject=f"Contact Inquiry: {subject}",
                 recipients=['23it010@psr.edu.in'],
                 body=f"New Contact Form Submission:\n\nName: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
             )
             send_mail(msg)
-            
-            flash(f"Thank you, {name}. Your message has been received! Our team will get back to you soon.", "success")
-
+            email_sent = True
         except Exception as e:
-            flash("Sorry, there was an issue saving your message. Please try again later.", "error")
-            print(f"Database/Email Error: {e}")
+            print(f"Email Send Error: {e}")
+
+        if db_saved or email_sent:
+            flash(f"Thank you, {name}. Your message has been received! Our team will get back to you soon.", "success")
+        else:
+            flash("Sorry, we encountered an error processing your request. Please contact us via WhatsApp or Phone.", "error")
+
 
             
         return redirect(url_for('contact'))
@@ -187,22 +197,32 @@ def inquiry():
             "message": message,
             "submitted_at": datetime.datetime.now()
         }
+        # Try to store in Database
+        db_saved = False
         try:
             inquiries_collection.insert_one(inquiry_data)
-            
-            # Send Email for Quote Request
+            db_saved = True
+        except Exception as e:
+            print(f"Inquiry Database Error: {e}")
+
+        # Try to send Email notification
+        email_sent = False
+        try:
             msg = Message(
                 subject=f"New Quote Request: {product}",
                 recipients=['23it010@psr.edu.in'],
                 body=f"Hello,\n\nYou have a new Quote Request:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
             )
             send_mail(msg)
-            
-            flash(f"Your quote request for {product} has been successfully sent! We will contact you soon.", "success")
-
+            email_sent = True
         except Exception as e:
-            flash("Your request could not be sent. Please try again.", "error")
-            print(f"Inquiry Error: {e}")
+            print(f"Inquiry Email Error: {e}")
+
+        if db_saved or email_sent:
+            flash(f"Your quote request for {product} has been successfully sent! We will contact you soon.", "success")
+        else:
+            flash("Your request could not be processed at the moment. Please call us directly.", "error")
+
 
             
         return redirect(url_for('products'))
