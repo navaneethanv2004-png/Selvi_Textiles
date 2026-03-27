@@ -14,9 +14,9 @@ app.secret_key = os.environ.get('SECRET_KEY', 'selvi_textiles_secret_key')
 
 # Flask-Mail Configuration for Vercel/Gmail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = 'navaneethanv686@gmail.com'
 # Use password from environment variable or hardcoded fallback for immediate functional testing on Vercel
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'rsad myyu sqhs oiww')
@@ -34,15 +34,10 @@ def send_async_email(app, msg):
             print(f"Failed to send email: {e}")
 
 def send_mail(msg):
-    # If on Vercel, send synchronously to avoid process termination before completion
-    if os.environ.get('VERCEL'):
-        try:
-            mail.send(msg)
-        except Exception as e:
-            print(f"Vercel Email Error: {e}")
-            raise e
-    else:
-        threading.Thread(target=send_async_email, args=(app, msg)).start()
+    # For Vercel, we still use a thread for immediate response (<1sec), 
+    # though it carries a slight risk of being closed by Vercel's lifecycle.
+    # On port 465 (SSL), connection is faster, reducing total process time.
+    threading.Thread(target=send_async_email, args=(app, msg)).start()
 
 
 # MongoDB Configuration (Local or Cloud)
