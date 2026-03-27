@@ -637,6 +637,29 @@ textarea.form-control {
     transform: translateY(-10px) scale(1.1);
 }
 
+/* Phone Float */
+.phone-float {
+    position: fixed;
+    bottom: 120px;
+    right: 40px;
+    background: #007bff;
+    color: #fff;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 35px;
+    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.4);
+    z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.phone-float:hover {
+    transform: translateY(-10px) scale(1.1);
+}
+
 /* Features grid for Home/About */
 .features-grid {
     display: grid;

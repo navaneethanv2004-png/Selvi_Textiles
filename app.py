@@ -15,9 +15,9 @@ app.secret_key = os.environ.get('SECRET_KEY', 'selvi_textiles_secret_key')
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'navaneethanv2004@gmail.com'
+app.config['MAIL_USERNAME'] = '23it010@psr.edu.in'
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = 'navaneethanv2004@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = '23it010@psr.edu.in'
 
 mail = Mail(app)
 
@@ -131,7 +131,7 @@ def contact():
             # Send Email Notification
             msg = Message(
                 subject=f"Contact Inquiry: {subject}",
-                recipients=['navaneethanv2004@gmail.com'],
+                recipients=['23it010@psr.edu.in'],
                 body=f"New Contact Form Submission:\n\nName: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
             )
             mail.send(msg)
@@ -169,7 +169,7 @@ def inquiry():
             # Send Email for Quote Request
             msg = Message(
                 subject=f"New Quote Request: {product}",
-                recipients=['navaneethanv2004@gmail.com'],
+                recipients=['23it010@psr.edu.in'],
                 body=f"Hello,\n\nYou have a new Quote Request:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
             )
             mail.send(msg)
