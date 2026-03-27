@@ -44,7 +44,8 @@ def send_mail(msg):
 MONGO_URI = os.environ.get('MONGO_URI', "mongodb://localhost:27017/")
 
 try:
-    client = MongoClient(MONGO_URI)
+    # Set a 2-second timeout for server selection to prevent long hangs if DB is unreachable
+    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=2000)
     db = client["selvi_textiles"]
     contacts_collection = db["contacts"]
     inquiries_collection = db["inquiries"]
