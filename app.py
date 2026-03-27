@@ -14,14 +14,16 @@ app.secret_key = os.environ.get('SECRET_KEY', 'selvi_textiles_secret_key')
 
 # Flask-Mail Configuration for Vercel/Gmail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = '23it010@psr.edu.in'
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+# Use password from environment variable or hardcoded fallback for immediate functional testing on Vercel
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'yulv ffos ibhb uwbx')
 app.config['MAIL_DEFAULT_SENDER'] = ('Selvi Textiles', '23it010@psr.edu.in')
 
 mail = Mail(app)
+
 
 def send_async_email(app, msg):
     with app.app_context():
