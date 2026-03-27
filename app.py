@@ -14,11 +14,12 @@ app.secret_key = os.environ.get('SECRET_KEY', 'selvi_textiles_secret_key')
 
 # Flask-Mail Configuration for Vercel/Gmail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = '23it010@psr.edu.in'
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = '23it010@psr.edu.in'
+app.config['MAIL_DEFAULT_SENDER'] = ('Selvi Textiles', '23it010@psr.edu.in')
 
 mail = Mail(app)
 
@@ -29,6 +30,17 @@ def send_async_email(app, msg):
             print("Email sent successfully!")
         except Exception as e:
             print(f"Failed to send email: {e}")
+
+def send_mail(msg):
+    # If on Vercel, send synchronously to avoid process termination before completion
+    if os.environ.get('VERCEL'):
+        try:
+            mail.send(msg)
+        except Exception as e:
+            print(f"Vercel Email Error: {e}")
+            raise e
+    else:
+        threading.Thread(target=send_async_email, args=(app, msg)).start()
 
 
 # MongoDB Configuration (Local or Cloud)
@@ -138,16 +150,16 @@ def contact():
         try:
             contacts_collection.insert_one(contact_data)
             
-            # Send Email Notification Asynchronously
+            # Send Email Notification
             msg = Message(
                 subject=f"Contact Inquiry: {subject}",
                 recipients=['23it010@psr.edu.in'],
                 body=f"New Contact Form Submission:\n\nName: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
             )
-            # Use threading to send email in background
-            threading.Thread(target=send_async_email, args=(app, msg)).start()
+            send_mail(msg)
             
             flash(f"Thank you, {name}. Your message has been received! Our team will get back to you soon.", "success")
+
         except Exception as e:
             flash("Sorry, there was an issue saving your message. Please try again later.", "error")
             print(f"Database/Email Error: {e}")
@@ -178,16 +190,16 @@ def inquiry():
         try:
             inquiries_collection.insert_one(inquiry_data)
             
-            # Send Email for Quote Request Asynchronously
+            # Send Email for Quote Request
             msg = Message(
                 subject=f"New Quote Request: {product}",
                 recipients=['23it010@psr.edu.in'],
                 body=f"Hello,\n\nYou have a new Quote Request:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
             )
-            # Use threading to send email in background
-            threading.Thread(target=send_async_email, args=(app, msg)).start()
+            send_mail(msg)
             
             flash(f"Your quote request for {product} has been successfully sent! We will contact you soon.", "success")
+
         except Exception as e:
             flash("Your request could not be sent. Please try again.", "error")
             print(f"Inquiry Error: {e}")
