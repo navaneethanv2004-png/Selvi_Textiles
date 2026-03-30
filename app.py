@@ -184,14 +184,16 @@ def inquiry():
     if request.method == 'POST':
         name = request.form.get('name')
         phone = request.form.get('phone')
-        product = request.form.get('product')
+        product_list = request.form.getlist('product')
+        product = ", ".join(product_list) if product_list else "Not Specified"
         quantity = request.form.get('quantity')
         message = request.form.get('message')
         # Store in DB
         inquiry_data = {
             "name": name,
             "phone": phone,
-            "product": product,
+            "products": product_list,  # Store as a list in DB
+            "product_summary": product, # For legacy/easy view
             "quantity": quantity,
             "message": message,
             "submitted_at": datetime.datetime.now()

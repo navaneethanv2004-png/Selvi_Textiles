@@ -940,3 +940,39 @@ textarea.form-control {
         height: 120px !important;
     }
 }
+/* Checkbox Group for Inquiries */
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.4);
+    padding: 1.5rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-top: 5px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    transition: all 0.2s ease;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.checkbox-item:hover {
+    background: rgba(0, 82, 204, 0.05);
+    color: var(--primary-color);
+}
+
+.checkbox-item input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}

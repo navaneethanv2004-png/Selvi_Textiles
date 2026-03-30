@@ -22,15 +22,20 @@
         </div>
 
         <div class="form-group">
-            <label for="product">Select Product</label>
-            <select id="product" name="product" class="form-control" required>
-                <option value="" disabled {% if not product_name %}selected{% endif %}>--- Choose a Product ---</option>
+            <label>Select Product(s) <span style="font-weight: normal; color: var(--text-muted); font-size: 0.85rem;">(Choose one or more)</span></label>
+            <div class="checkbox-group">
                 {% for p in products %}
-                <option value="{{ p.name }}" {% if p.name==product_name %}selected{% endif %}>{{ p.name }}</option>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="product" value="{{ p.name }}" 
+                        {% if p.name == product_name %}checked{% endif %}>
+                    {{ p.name }}
+                </label>
                 {% endfor %}
-                <option value="Multiple Products" {% if product_name=='Multiple Products' %}selected{% endif %}>Multiple
-                    / Other Medical Textiles</option>
-            </select>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="product" value="Other Medical Textiles">
+                    Other Medical Textiles
+                </label>
+            </div>
         </div>
 
         <div class="form-group">
