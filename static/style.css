@@ -217,9 +217,11 @@ footer a:hover {
     margin-bottom: 10px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     background: var(--white);
     border-left: 5px solid;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(5px);
 }
 
 .flash-msg.success {

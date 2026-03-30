@@ -89,11 +89,78 @@
             navLinks.classList.toggle('active');
         });
 
-        // Hide Flash Message after 5 seconds
-        setTimeout(() => {
-            const flashes = document.querySelectorAll('.flash-msg');
-            flashes.forEach(flash => flash.style.display = 'none');
-        }, 5000);
+        // Function to show flash messages dynamically
+        function showFlash(message, category) {
+            const container = document.querySelector('.flash-container');
+            if (!container) return;
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flash-msg ${category}`;
+            
+            // Add icon based on category
+            const icon = category === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            msgDiv.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
+            
+            container.appendChild(msgDiv);
+            
+            // Auto hide
+            setTimeout(() => {
+                msgDiv.style.opacity = '0';
+                msgDiv.style.transform = 'translateY(-20px)';
+                setTimeout(() => msgDiv.remove(), 500);
+            }, 5000);
+        }
+
+        // AJAX Form Submission
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                // Only intercept POST forms that don't explicitly disable AJAX
+                if (form.method.toLowerCase() !== 'post' || form.dataset.noAjax === 'true') return;
+
+                e.preventDefault();
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalBtnContent = submitBtn.innerHTML;
+                
+                // Loading State
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch(form.action || window.location.href, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        showFlash(data.message, 'success');
+                        if (form.dataset.reset !== 'false') form.reset();
+                    } else {
+                        showFlash(data.message || 'An error occurred. Please try again.', 'error');
+                    }
+                } catch (err) {
+                    console.error('Submission error:', err);
+                    showFlash('Check your internet connection and try again.', 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnContent;
+                }
+            });
+        });
+
+        // Cleanup existing flash messages
+        document.querySelectorAll('.flash-msg').forEach(msg => {
+            setTimeout(() => {
+                msg.style.opacity = '0';
+                msg.style.transform = 'translateY(-20px)';
+                setTimeout(() => msg.remove(), 500);
+            }, 5000);
+        });
     </script>
 </body>
 

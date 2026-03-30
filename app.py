@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import datetime
 import os
-import threading
+from threading import Thread
 
 # Load environment variables (Local)
 load_dotenv(override=True)
@@ -29,16 +29,13 @@ def send_async_email(app, msg):
     with app.app_context():
         try:
             mail.send(msg)
-            print("Email sent successfully!")
+            print("Email sent successfully via background thread!")
         except Exception as e:
-            print(f"Failed to send email: {e}")
+            print(f"Background Email Error: {e}")
 
 def send_mail(msg):
-    # For Vercel, we still use a thread for immediate response (<1sec), 
-    # though it carries a slight risk of being closed by Vercel's lifecycle.
-    # On port 465 (SSL), connection is faster, reducing total process time.
-    threading.Thread(target=send_async_email, args=(app, msg)).start()
-
+    # Asynchronous sending for better user experience
+    Thread(target=send_async_email, args=(app, msg)).start()
 
 # MongoDB Configuration (Local or Cloud)
 MONGO_URI = os.environ.get('MONGO_URI', "mongodb://localhost:27017/")
@@ -166,13 +163,17 @@ def contact():
         except Exception as e:
             print(f"Email Send Error: {e}")
 
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            if db_saved or email_sent:
+                return {"status": "success", "message": f"Thank you, {name}. Your message has been received!"}
+            else:
+                return {"status": "error", "message": "Sorry, we encountered an error."}, 500
+
         if db_saved or email_sent:
             flash(f"Thank you, {name}. Your message has been received! Our team will get back to you soon.", "success")
         else:
             flash("Sorry, we encountered an error processing your request. Please contact us via WhatsApp or Phone.", "error")
 
-
-            
         return redirect(url_for('contact'))
     return render_template('contact.html', title='Contact Us')
 
@@ -216,13 +217,17 @@ def inquiry():
         except Exception as e:
             print(f"Inquiry Email Error: {e}")
 
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            if db_saved or email_sent:
+                return {"status": "success", "message": f"Your quote request for {product} has been successfully sent!"}
+            else:
+                return {"status": "error", "message": "Inquiry could not be processed."}, 500
+
         if db_saved or email_sent:
             flash(f"Your quote request for {product} has been successfully sent! We will contact you soon.", "success")
         else:
             flash("Your request could not be processed at the moment. Please call us directly.", "error")
 
-
-            
         return redirect(url_for('products'))
     return render_template('inquiry.html', title='Request Quote', product_name=product_name, products=PRODUCTS)
 
