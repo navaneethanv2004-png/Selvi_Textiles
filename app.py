@@ -25,17 +25,18 @@ app.config['MAIL_DEFAULT_SENDER'] = ('Selvi Textiles', 'navaneethanv686@gmail.co
 mail = Mail(app)
 
 
-def send_async_email(app, msg):
-    with app.app_context():
-        try:
-            mail.send(msg)
-            print("Email sent successfully via background thread!")
-        except Exception as e:
-            print(f"Background Email Error: {e}")
-
 def send_mail(msg):
-    # Asynchronous sending for better user experience
-    Thread(target=send_async_email, args=(app, msg)).start()
+    """
+    Sends email synchronously for reliability. 
+    On platforms like Vercel, background threads are terminated as soon as the response is sent.
+    """
+    try:
+        mail.send(msg)
+        print("Email sent successfully!")
+        return True
+    except Exception as e:
+        print(f"Email Sending Error: {e}")
+        return False
 
 # MongoDB Configuration (Local or Cloud)
 MONGO_URI = os.environ.get('MONGO_URI', "mongodb://localhost:27017/")
@@ -150,18 +151,13 @@ def contact():
         except Exception as e:
             print(f"Database Save Error: {e}")
 
-        # Try to send Email notification
-        email_sent = False
-        try:
-            msg = Message(
-                subject=f"Contact Inquiry: {subject}",
-                recipients=['navaneethanv686@gmail.com'],
-                body=f"New Contact Form Submission:\n\nName: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
-            )
-            send_mail(msg)
-            email_sent = True
-        except Exception as e:
-            print(f"Email Send Error: {e}")
+        # Prepare and send mail notification
+        msg = Message(
+            subject=f"Contact Inquiry: {subject}",
+            recipients=['navaneethanv686@gmail.com'],
+            body=f"New Contact Form Submission:\n\nName: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
+        )
+        email_sent = send_mail(msg)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             if db_saved or email_sent:
@@ -206,18 +202,13 @@ def inquiry():
         except Exception as e:
             print(f"Inquiry Database Error: {e}")
 
-        # Try to send Email notification
-        email_sent = False
-        try:
-            msg = Message(
-                subject=f"New Quote Request: {product}",
-                recipients=['navaneethanv686@gmail.com'],
-                body=f"Hello,\n\nYou have a new Quote Request:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
-            )
-            send_mail(msg)
-            email_sent = True
-        except Exception as e:
-            print(f"Inquiry Email Error: {e}")
+        # Prepare and send mail notification
+        msg = Message(
+            subject=f"New Quote Request: {product}",
+            recipients=['navaneethanv686@gmail.com'],
+            body=f"Hello,\n\nYou have a new Quote Request:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
+        )
+        email_sent = send_mail(msg)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             if db_saved or email_sent:
