@@ -4,6 +4,9 @@
 <div class="page-header">
     <h1>Admin Dashboard</h1>
     <p>View MongoDB Form Submissions</p>
+    <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; margin-top: 15px; font-size: 0.9rem; border: 1px solid #ffeeba; display: inline-block;">
+        <i class="fa-solid fa-triangle-exclamation"></i> <strong>Note:</strong> Protect this URL! Do not share it publicly to ensure your customer data remains private.
+    </div>
 </div>
 
 <section style="padding: 3rem 5%; max-width: 1200px; margin: auto;">
@@ -27,10 +30,10 @@
             <tbody>
                 {% for inq in inquiries %}
                 <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 1rem;">{{ inq.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td style="padding: 1rem;">{{ inq.submitted_at.strftime('%Y-%m-%d %H:%M') if inq.submitted_at else 'N/A' }}</td>
                     <td style="padding: 1rem; font-weight: bold;">{{ inq.name }}</td>
                     <td style="padding: 1rem;">{{ inq.phone }}</td>
-                    <td style="padding: 1rem; color: var(--primary-color);">{{ inq.product }}</td>
+                    <td style="padding: 1rem; color: var(--primary-color);">{{ inq.product_summary }}</td>
                     <td style="padding: 1rem;">{{ inq.quantity }}</td>
                     <td style="padding: 1rem;">{{ inq.message }}</td>
                 </tr>
