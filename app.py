@@ -14,29 +14,33 @@ app.secret_key = os.environ.get('SECRET_KEY', 'selvi_textiles_secret_key')
 
 # Flask-Mail Configuration for Vercel/Gmail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = 'navaneethanv686@gmail.com'
-# Use password from environment variable or hardcoded fallback for immediate functional testing on Vercel
+# Use password from environment variable or hardcoded fallback
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'rsad myyu sqhs oiww')
 app.config['MAIL_DEFAULT_SENDER'] = ('Selvi Textiles', 'navaneethanv686@gmail.com')
 
 mail = Mail(app)
 
+def send_async_email(app, msg):
+    with app.app_context():
+        try:
+            mail.send(msg)
+            print("Background Email Success!")
+        except Exception as e:
+            print(f"Background Email Error: {e}")
 
 def send_mail(msg):
     """
-    Sends email synchronously for reliability. 
-    On platforms like Vercel, background threads are terminated as soon as the response is sent.
+    Sends email in a background thread for maximum speed.
+    The user won't have to wait for the email to finish.
     """
-    try:
-        mail.send(msg)
-        print("Email sent successfully!")
-        return True
-    except Exception as e:
-        print(f"Email Sending Error: {e}")
-        return False
+    thread = Thread(target=send_async_email, args=(app, msg))
+    thread.daemon = True # Ensure it doesn't block exit
+    thread.start()
+    return True # Return true immediately to keep it fast
 
 # MongoDB Configuration (Local or Cloud)
 MONGO_URI = os.environ.get('MONGO_URI', "mongodb://localhost:27017/")
