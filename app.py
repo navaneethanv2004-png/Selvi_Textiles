@@ -49,14 +49,23 @@ def send_mail(msg):
 # MongoDB Configuration (Local or Cloud)
 MONGO_URI = os.environ.get('MONGO_URI', "mongodb://localhost:27017/")
 
+db = None
+contacts_collection = None
+inquiries_collection = None
+
 try:
     # Set a 2-second timeout for server selection to prevent long hangs if DB is unreachable
     client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=2000)
     db = client["selvi_textiles"]
     contacts_collection = db["contacts"]
     inquiries_collection = db["inquiries"]
+    # Test connection
+    client.admin.command('ping')
+    print("Successfully connected to MongoDB!")
 except Exception as e:
     print(f"Could not connect to MongoDB: {e}")
+    # We continue so the app doesn't crash on startup, allowing email-only fallbacks
+
 
 # Product catalog
 PRODUCTS = [
