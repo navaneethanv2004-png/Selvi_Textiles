@@ -34,13 +34,17 @@ def send_async_email(app, msg):
 
 def send_mail(msg):
     """
-    Sends email in a background thread for maximum speed.
-    The user won't have to wait for the email to finish.
+    Sends email synchronously.
+    On serverless platforms like Vercel, background threads are killed 
+    as soon as the response is sent, so we must wait for the email to finish.
     """
-    thread = Thread(target=send_async_email, args=(app, msg))
-    thread.daemon = True # Ensure it doesn't block exit
-    thread.start()
-    return True # Return true immediately to keep it fast
+    try:
+        mail.send(msg)
+        print("Email Success!")
+        return True
+    except Exception as e:
+        print(f"Email Error: {e}")
+        return False
 
 # MongoDB Configuration (Local or Cloud)
 MONGO_URI = os.environ.get('MONGO_URI', "mongodb://localhost:27017/")
@@ -157,8 +161,9 @@ def contact():
 
         # Prepare and send mail notification
         msg = Message(
-            subject=f"Contact Inquiry: {subject}",
+            subject=f"[NEW] Contact Inquiry: {subject}",
             recipients=['navaneethanv686@gmail.com'],
+            reply_to=email,
             body=f"New Contact Form Submission:\n\nName: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
         )
         email_sent = send_mail(msg)
@@ -208,20 +213,25 @@ def inquiry():
 
         # Prepare and send mail notification
         msg = Message(
-            subject=f"New Quote Request: {product}",
+            subject=f"[NEW] Quote Request: {product}",
             recipients=['navaneethanv686@gmail.com'],
             body=f"Hello,\n\nYou have a new Quote Request:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
         )
         email_sent = send_mail(msg)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            if db_saved or email_sent:
+            if db_saved and email_sent:
                 return {"status": "success", "message": f"Your quote request for {product} has been successfully sent!"}
+            elif db_saved:
+                return {"status": "success", "message": "Inquiry saved to database, but email notification failed. We will check it soon!"}
             else:
                 return {"status": "error", "message": "Inquiry could not be processed."}, 500
 
-        if db_saved or email_sent:
-            flash(f"Your quote request for {product} has been successfully sent! We will contact you soon.", "success")
+        if db_saved:
+            if email_sent:
+                flash(f"Your quote request for {product} has been successfully sent! We will contact you soon.", "success")
+            else:
+                flash("Your inquiry was saved, but we encountered an email delay. Don't worry, we'll get back to you soon!", "success")
         else:
             flash("Your request could not be processed at the moment. Please call us directly.", "error")
 

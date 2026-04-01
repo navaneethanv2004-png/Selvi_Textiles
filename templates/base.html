@@ -29,7 +29,7 @@
 
     <!-- Navigation -->
     <nav class="navbar">
-        <a href="/" class="nav-logo">
+        <a href="{{ url_for('home') }}" class="nav-logo">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Selvi Textiles Logo">
             <span>Selvi Textiles</span>
         </a>
@@ -37,10 +37,10 @@
             <i class="fa-solid fa-bars"></i>
         </div>
         <ul class="nav-links" id="nav-links">
-            <li><a href="/" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
-            <li><a href="/about" class="{% if request.endpoint == 'about' %}active{% endif %}">About Us</a></li>
-            <li><a href="/products" class="{% if request.endpoint == 'products' %}active{% endif %}">Products</a></li>
-            <li><a href="/contact" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact Us</a></li>
+            <li><a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
+            <li><a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About Us</a></li>
+            <li><a href="{{ url_for('products') }}" class="{% if request.endpoint == 'products' %}active{% endif %}">Products</a></li>
+            <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact Us</a></li>
         </ul>
     </nav>
 
@@ -82,7 +82,7 @@
                 style="color: inherit; text-decoration: none;">selvitextilesv@gmail.com</a>
         </p>
         <p style="margin-top: 10px; font-size: 0.9em;">
-            <a href="/about">About</a> | <a href="/products">Products</a> | <a href="/contact">Contact</a>
+            <a href="{{ url_for('about') }}">About</a> | <a href="{{ url_for('products') }}">Products</a> | <a href="{{ url_for('contact') }}">Contact</a>
         </p>
     </footer>
 

@@ -25,17 +25,26 @@
                     <th style="padding: 1rem; text-align: left;">Product</th>
                     <th style="padding: 1rem; text-align: left;">Quantity</th>
                     <th style="padding: 1rem; text-align: left;">Message</th>
+                    <th style="padding: 1rem; text-align: left;">Quick Connect</th>
                 </tr>
             </thead>
             <tbody>
                 {% for inq in inquiries %}
-                <tr style="border-bottom: 1px solid var(--border-color);">
+                <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='transparent'">
                     <td style="padding: 1rem;">{{ inq.submitted_at.strftime('%Y-%m-%d %H:%M') if inq.submitted_at else 'N/A' }}</td>
                     <td style="padding: 1rem; font-weight: bold;">{{ inq.name }}</td>
                     <td style="padding: 1rem;">{{ inq.phone }}</td>
                     <td style="padding: 1rem; color: var(--primary-color);">{{ inq.product_summary }}</td>
                     <td style="padding: 1rem;">{{ inq.quantity }}</td>
                     <td style="padding: 1rem;">{{ inq.message }}</td>
+                    <td style="padding: 1rem; white-space: nowrap;">
+                        <a href="tel:{{ inq.phone }}" style="display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; border-radius: 50%; background: #007bff; color: white; text-decoration: none; margin-right: 5px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Call Customer">
+                            <i class="fa-solid fa-phone" style="font-size: 0.9rem;"></i>
+                        </a>
+                        <a href="https://wa.me/{{ inq.phone if inq.phone.startswith('+') else '91' + inq.phone|replace(' ', '')|replace('-', '') }}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; border-radius: 50%; background: #25D366; color: white; text-decoration: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="WhatsApp Customer">
+                            <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i>
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -57,16 +66,22 @@
                     <th style="padding: 1rem; text-align: left;">Email</th>
                     <th style="padding: 1rem; text-align: left;">Subject</th>
                     <th style="padding: 1rem; text-align: left;">Message</th>
+                    <th style="padding: 1rem; text-align: left;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for msg in contacts %}
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 1rem;">{{ msg.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 1rem;">{{ msg.submitted_at.strftime('%Y-%m-%d %H:%M') if msg.submitted_at else 'N/A' }}</td>
                     <td style="padding: 1rem; font-weight: bold;">{{ msg.name }}</td>
                     <td style="padding: 1rem;">{{ msg.email }}</td>
                     <td style="padding: 1rem; color: var(--primary-color);">{{ msg.subject }}</td>
                     <td style="padding: 1rem;">{{ msg.message }}</td>
+                    <td style="padding: 1rem;">
+                        <a href="mailto:{{ msg.email }}" style="display: inline-flex; align-items: center; justify-content: center; background: var(--secondary-color); color: white; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                            <i class="fa-solid fa-envelope" style="margin-right: 5px;"></i> Reply via Email
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

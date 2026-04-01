@@ -50,7 +50,32 @@
                 placeholder="Specify requirements, preferred delivery date, etc."></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Submit Inquiry</button>
+        <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary" style="flex: 1; min-width: 150px;">Submit Inquiry</button>
+            <button type="button" id="whatsapp-btn" class="btn" style="flex: 1; min-width: 150px; background: #25D366; color: white; border: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Send on WhatsApp
+            </button>
+        </div>
     </form>
 </div>
+
+<script>
+document.getElementById('whatsapp-btn').addEventListener('click', function() {
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    const products = Array.from(document.querySelectorAll('input[name="product"]:checked')).map(cb => cb.value);
+    const quantity = document.getElementById('quantity').value;
+    const message = document.getElementById('message').value;
+
+    if (!name || !phone || products.length === 0 || !quantity) {
+        showFlash('Please fill in all required fields first.', 'error');
+        return;
+    }
+
+    const businessPhone = '918940896918'; // Target admin phone number
+    const text = `*New Inquiry from Selvi Textiles Website*%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Products:* ${products.join(', ')}%0A*Quantity:* ${quantity}%0A*Message:* ${message}`;
+    
+    window.open(`https://wa.me/${businessPhone}?text=${text}`, '_blank');
+});
+</script>
 {% endblock %}
