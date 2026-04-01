@@ -113,34 +113,12 @@
                 <textarea id="message" name="message" class="form-control" required
                     placeholder="How can we help you?"></textarea>
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap;">
-                <button type="submit" class="btn btn-primary" style="flex: 1; min-width: 150px;">Send Message</button>
-                <button type="button" id="whatsapp-contact-btn" class="btn" style="flex: 1; min-width: 150px; background: #25D366; color: white; border: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Send on WhatsApp
-                </button>
+            <div style="margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary btn-block">Send Message</button>
             </div>
         </form>
     </div>
 </section>
-
-<script>
-document.getElementById('whatsapp-contact-btn').addEventListener('click', function() {
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const subject = document.getElementById('subject').value;
-    const message = document.getElementById('message').value;
-
-    if (!name || !email || !subject || !message) {
-        showFlash('Please fill in all fields first.', 'error');
-        return;
-    }
-
-    const businessPhone = '918940896918';
-    const text = `*New Contact Message from Selvi Textiles*%0A%0A*Name:* ${name}%0A*Email:* ${email}%0A*Subject:* ${subject}%0A*Message:* ${message}`;
-    
-    window.open(`https://wa.me/${businessPhone}?text=${text}`, '_blank');
-});
-</script>
 
 <!-- Google Map Integration -->
 <div class="map-container" style="position: relative;">
