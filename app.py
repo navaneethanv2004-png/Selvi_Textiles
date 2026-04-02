@@ -170,17 +170,18 @@ def contact():
         except Exception as e:
             print(f"Database Save Error: {e}")
 
-        # Prepare and send mail notification
+        # Prepare and send mail notification in the background for speed
         msg = Message(
             subject=f"[NEW] Contact Inquiry: {subject}",
             recipients=['navaneethanv686@gmail.com'],
             reply_to=email,
             body=f"New Contact Form Submission:\n\nName: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
         )
-        email_sent = send_mail(msg)
+        Thread(target=send_async_email, args=(app, msg)).start()
+        email_sent = True # Assume success for UI snappiness
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            if db_saved or email_sent:
+            if db_saved:
                 return {"status": "success", "message": f"Thank you, {name}. Your message has been received!"}
             else:
                 return {"status": "error", "message": "Sorry, we encountered an error."}, 500
@@ -222,13 +223,14 @@ def inquiry():
         except Exception as e:
             print(f"Inquiry Database Error: {e}")
 
-        # Prepare and send mail notification
+        # Prepare and send mail notification in the background for speed
         msg = Message(
             subject=f"[NEW] Quote Request: {product}",
             recipients=['navaneethanv686@gmail.com'],
-            body=f"Hello,\n\nYou have a new Quote Request:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
+            body=f"Hello,\n\nYou have a new Quote Request from Selvi Textiles:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
         )
-        email_sent = send_mail(msg)
+        Thread(target=send_async_email, args=(app, msg)).start()
+        email_sent = True # Assume success for UI snappiness
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             if db_saved or email_sent:
@@ -279,13 +281,14 @@ def feedback():
         except Exception as e:
             print(f"Feedback Database Error: {e}")
             db_saved = False
-        # Send email notification for feedback
+        # Send email notification for feedback in background for speed
         msg = Message(
             subject=f"[NEW] Customer Feedback: {rating} Stars",
             recipients=['navaneethanv686@gmail.com'],
             body=f"You have new feedback from Selvi Textiles:\n\nName: {name}\nEmail: {email}\nRating: {rating}/5\nComment: {comment}"
         )
-        email_sent = send_mail(msg)
+        Thread(target=send_async_email, args=(app, msg)).start()
+        email_sent = True # Assume success for UI snappiness
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             if db_saved or email_sent:
