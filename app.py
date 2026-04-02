@@ -52,6 +52,7 @@ MONGO_URI = os.environ.get('MONGO_URI', "mongodb://localhost:27017/")
 db = None
 contacts_collection = None
 inquiries_collection = None
+feedbacks_collection = None
 
 try:
     # Set a 2-second timeout for server selection to prevent long hangs if DB is unreachable
@@ -282,25 +283,25 @@ def feedback():
             db_saved = True
         except Exception as e:
             print(f"Feedback Database Error: {e}")
-
+            db_saved = False
         # Send email notification for feedback
         msg = Message(
             subject=f"[NEW] Customer Feedback: {rating} Stars",
             recipients=['navaneethanv686@gmail.com'],
-            body=f"You have new feedback:\n\nName: {name}\nEmail: {email}\nRating: {rating}/5\nComment: {comment}"
+            body=f"You have new feedback from Selvi Textiles:\n\nName: {name}\nEmail: {email}\nRating: {rating}/5\nComment: {comment}"
         )
-        send_mail(msg)
+        email_sent = send_mail(msg)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            if db_saved:
+            if db_saved or email_sent:
                 return {"status": "success", "message": "Thank you for your valuable feedback!"}
             else:
-                return {"status": "error", "message": "Could not save feedback."}, 500
+                return {"status": "error", "message": "Feedback could not be processed at this time."}, 500
 
-        if db_saved:
+        if db_saved or email_sent:
             flash("Thank you for your valuable feedback!", "success")
         else:
-            flash("Could not process feedback.", "error")
+            flash("Sorry, we encountered an error. Please contact us directly.", "error")
             
         return redirect(url_for('home'))
         
