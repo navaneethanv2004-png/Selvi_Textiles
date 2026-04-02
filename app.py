@@ -59,6 +59,7 @@ try:
     db = client["selvi_textiles"]
     contacts_collection = db["contacts"]
     inquiries_collection = db["inquiries"]
+    feedbacks_collection = db["feedbacks"]
     # Test connection
     client.admin.command('ping')
     print("Successfully connected to MongoDB!")
@@ -258,6 +259,52 @@ def admin():
         flash("Could not fetch data from database.", "error")
         print("Fetch Error:", e)
     return render_template('admin.html', title='Admin Dashboard', contacts=contacts, inquiries=inquiries)
+
+@app.route('/feedback', methods=['GET', 'POST'])
+def feedback():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        rating = request.form.get('rating')
+        comment = request.form.get('comment')
+        
+        feedback_data = {
+            "name": name,
+            "email": email,
+            "rating": int(rating) if rating else 5,
+            "comment": comment,
+            "submitted_at": datetime.datetime.now()
+        }
+
+        db_saved = False
+        try:
+            feedbacks_collection.insert_one(feedback_data)
+            db_saved = True
+        except Exception as e:
+            print(f"Feedback Database Error: {e}")
+
+        # Send email notification for feedback
+        msg = Message(
+            subject=f"[NEW] Customer Feedback: {rating} Stars",
+            recipients=['navaneethanv686@gmail.com'],
+            body=f"You have new feedback:\n\nName: {name}\nEmail: {email}\nRating: {rating}/5\nComment: {comment}"
+        )
+        send_mail(msg)
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            if db_saved:
+                return {"status": "success", "message": "Thank you for your valuable feedback!"}
+            else:
+                return {"status": "error", "message": "Could not save feedback."}, 500
+
+        if db_saved:
+            flash("Thank you for your valuable feedback!", "success")
+        else:
+            flash("Could not process feedback.", "error")
+            
+        return redirect(url_for('home'))
+        
+    return render_template('feedback.html', title='Give Feedback')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

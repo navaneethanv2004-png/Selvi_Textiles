@@ -899,20 +899,28 @@ textarea.form-control {
         bottom: 15px !important;
     }
 
+    .flash-container {
+        top: 90px;
+        width: 94%;
+        right: 3%;
+        left: 3%;
+        padding: 0;
+    }
+
     .whatsapp-float {
-        width: 55px;
-        height: 55px;
-        font-size: 30px;
-        bottom: 20px;
+        width: 60px;
+        height: 60px;
+        font-size: 32px;
+        bottom: 25px;
         right: 20px;
     }
 
-    .flash-container {
-        top: 70px;
-        width: 90%;
-        right: 5%;
-        left: 5%;
-        padding: 0;
+    .phone-float {
+        width: 60px;
+        height: 60px;
+        font-size: 30px;
+        bottom: 100px;
+        right: 20px;
     }
 }
 

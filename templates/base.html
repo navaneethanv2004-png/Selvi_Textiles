@@ -40,6 +40,7 @@
             <li><a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
             <li><a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About Us</a></li>
             <li><a href="{{ url_for('products') }}" class="{% if request.endpoint == 'products' %}active{% endif %}">Products</a></li>
+            <li><a href="{{ url_for('feedback') }}" class="{% if request.endpoint == 'feedback' %}active{% endif %}">Feedback</a></li>
             <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact Us</a></li>
         </ul>
     </nav>
@@ -142,13 +143,37 @@
                         }
                     });
 
-                    const data = await response.json();
+                    const dataRaw = await response.text();
+                    let data;
+                    try {
+                        data = JSON.parse(dataRaw);
+                    } catch (pErr) {
+                        data = { status: response.ok ? 'success' : 'error', message: 'Request processed. Page will reload.' };
+                        if (response.ok) setTimeout(() => window.location.reload(), 2000);
+                    }
                     
+                    const feedback = form.querySelector('#form-feedback');
                     if (response.ok) {
                         showFlash(data.message, 'success');
+                        if (feedback) {
+                            feedback.style.display = 'block';
+                            feedback.style.background = '#d1fae5';
+                            feedback.style.color = '#065f46';
+                            feedback.style.border = '1px solid #10b981';
+                            feedback.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${data.message}`;
+                        }
                         if (form.dataset.reset !== 'false') form.reset();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     } else {
                         showFlash(data.message || 'An error occurred. Please try again.', 'error');
+                        if (feedback) {
+                            feedback.style.display = 'block';
+                            feedback.style.background = '#fee2e2';
+                            feedback.style.color = '#991b1b';
+                            feedback.style.border = '1px solid #ef4444';
+                            feedback.innerHTML = `<i class="fa-solid fa-exclamation-circle"></i> ${data.message || 'An error occurred.'}`;
+                        }
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 } catch (err) {
                     console.error('Submission error:', err);
