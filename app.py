@@ -181,7 +181,7 @@ def contact():
         email_sent = True # Assume success for UI snappiness
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            if db_saved:
+            if db_saved or email_sent:
                 return {"status": "success", "message": f"Thank you, {name}. Your message has been received!"}
             else:
                 return {"status": "error", "message": "Sorry, we encountered an error."}, 500
