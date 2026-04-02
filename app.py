@@ -231,18 +231,13 @@ def inquiry():
         email_sent = send_mail(msg)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            if db_saved and email_sent:
+            if db_saved or email_sent:
                 return {"status": "success", "message": f"Your quote request for {product} has been successfully sent!"}
-            elif db_saved:
-                return {"status": "success", "message": "Inquiry saved to database, but email notification failed. We will check it soon!"}
             else:
-                return {"status": "error", "message": "Inquiry could not be processed."}, 500
+                return {"status": "error", "message": "Inquiry could not be processed at this time."}, 500
 
-        if db_saved:
-            if email_sent:
-                flash(f"Your quote request for {product} has been successfully sent! We will contact you soon.", "success")
-            else:
-                flash("Your inquiry was saved, but we encountered an email delay. Don't worry, we'll get back to you soon!", "success")
+        if db_saved or email_sent:
+            flash(f"Your quote request for {product} has been successfully sent! We will contact you soon.", "success")
         else:
             flash("Your request could not be processed at the moment. Please call us directly.", "error")
 
