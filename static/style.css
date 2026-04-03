@@ -201,27 +201,30 @@ footer a:hover {
 
 /* Flash Messages */
 .flash-container {
-    padding: 1rem 5%;
+    padding: 1rem 1.5rem;
     position: fixed;
-    top: 80px;
+    top: 90px;
     right: 20px;
+    max-width: 400px;
     z-index: 9999;
+    pointer-events: none;
 }
 
 .flash-msg {
-    padding: 1rem 1.5rem;
-    border-radius: var(--radius-sm);
-    font-weight: 500;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    animation: fadeInUp 0.4s ease;
-    margin-bottom: 10px;
+    padding: 1.2rem 1.8rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    animation: fadeInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
     gap: 12px;
     background: var(--white);
-    border-left: 5px solid;
+    border-left: 6px solid;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
+    pointer-events: auto;
 }
 
 .flash-msg.success {

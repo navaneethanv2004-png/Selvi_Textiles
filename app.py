@@ -55,8 +55,8 @@ inquiries_collection = None
 feedbacks_collection = None
 
 try:
-    # Set a 2-second timeout for server selection to prevent long hangs if DB is unreachable
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=2000)
+    # Set a 1.5-second timeout to prevent long hangs on mobile/serverless
+    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=1500)
     db = client["selvi_textiles"]
     contacts_collection = db["contacts"]
     inquiries_collection = db["inquiries"]
@@ -170,21 +170,21 @@ def contact():
         except Exception as e:
             print(f"Database Save Error: {e}")
 
-        # Prepare and send mail notification in the background for speed
+        # Prepare and send mail notification synchronously to ensure reliability on Vercel/mobile
         msg = Message(
             subject=f"[NEW] Contact Inquiry: {subject}",
             recipients=['navaneethanv686@gmail.com'],
             reply_to=email,
             body=f"New Contact Form Submission:\n\nName: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
         )
-        Thread(target=send_async_email, args=(app, msg)).start()
-        email_sent = True # Assume success for UI snappiness
+        email_sent = send_mail(msg)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             if db_saved or email_sent:
                 return {"status": "success", "message": f"Thank you, {name}. Your message has been received!"}
             else:
-                return {"status": "error", "message": "Sorry, we encountered an error."}, 500
+                print(f"FAILED: DB={db_saved}, Email={email_sent}")
+                return {"status": "error", "message": "The server could not process the request. Please call us."}, 500
 
         if db_saved or email_sent:
             flash(f"Thank you, {name}. Your message has been received! Our team will get back to you soon.", "success")
@@ -223,14 +223,13 @@ def inquiry():
         except Exception as e:
             print(f"Inquiry Database Error: {e}")
 
-        # Prepare and send mail notification in the background for speed
+        # Prepare and send mail notification synchronously
         msg = Message(
             subject=f"[NEW] Quote Request: {product}",
             recipients=['navaneethanv686@gmail.com'],
             body=f"Hello,\n\nYou have a new Quote Request from Selvi Textiles:\n\nName: {name}\nPhone: {phone}\nProduct: {product}\nQuantity: {quantity}\nMessage: {message}"
         )
-        Thread(target=send_async_email, args=(app, msg)).start()
-        email_sent = True # Assume success for UI snappiness
+        email_sent = send_mail(msg)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             if db_saved or email_sent:
@@ -281,14 +280,13 @@ def feedback():
         except Exception as e:
             print(f"Feedback Database Error: {e}")
             db_saved = False
-        # Send email notification for feedback in background for speed
+        # Send email notification for feedback synchronously
         msg = Message(
             subject=f"[NEW] Customer Feedback: {rating} Stars",
             recipients=['navaneethanv686@gmail.com'],
             body=f"You have new feedback from Selvi Textiles:\n\nName: {name}\nEmail: {email}\nRating: {rating}/5\nComment: {comment}"
         )
-        Thread(target=send_async_email, args=(app, msg)).start()
-        email_sent = True # Assume success for UI snappiness
+        email_sent = send_mail(msg)
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             if db_saved or email_sent:
